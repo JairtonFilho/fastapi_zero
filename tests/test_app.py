@@ -46,10 +46,10 @@ def test_read_user(client):
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-                'username': 'testusername',
-                'email': 'test@test.com',
-                'id': 1,
-            }
+        'username': 'testusername',
+        'email': 'test@test.com',
+        'id': 1,
+    }
 
 
 def test_read_user_not_found(client):
