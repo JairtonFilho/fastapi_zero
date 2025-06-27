@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from fastapi_zero.database import get_session
@@ -77,15 +78,21 @@ def update_user(user_id: int,
             status_code=HTTPStatus.NOT_FOUND
         )
 
-    user_db.email = user.email
-    user_db.password = user.password
-    user_db.username = user.username
+    try:
+        user_db.email = user.email
+        user_db.password = user.password
+        user_db.username = user.username
 
-    session.add(user_db)
-    session.commit()
-    session.refresh(user_db)
+        session.add(user_db)
+        session.commit()
+        session.refresh(user_db)
 
-    return user_db
+        return user_db
+    except IntegrityError:
+        raise HTTPException(
+            detail='Username or Email already exists',
+            status_code=HTTPStatus.CONFLICT,
+        )
 
 
 @app.delete(
